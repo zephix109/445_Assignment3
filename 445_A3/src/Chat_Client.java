@@ -56,13 +56,6 @@ class ChatSender implements Runnable {
         }
 	}
 	
-	private void buildMessage(String s) throws Exception {
-		byte buf[] = s.getBytes();
-		InetAddress ipAddr = InetAddress.getByName(ip_address);
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, ipAddr, port);
-		senderSocket.send(packet);
-	}
-	
 	public void read_text_from_user_input(BufferedReader in) {
 		try {
         	String line = in.readLine();
@@ -70,13 +63,18 @@ class ChatSender implements Runnable {
         		System.out.println("Closing chatbox");
         		System.exit(0);
         	}
-            Date date = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-            String formattedDate = sdf.format(date);                
-            buildMessage(formattedDate + " [" + username + "]: " + line);
+            buildMessage(line);
         } catch(Exception e) {
             System.err.println(e);
         }
+	}
+	
+	private void buildMessage(String line) throws Exception {
+		String message = "user:" + username + "\nmessage:" + line + "\n\n";
+		byte buf[] = message.getBytes();
+		InetAddress ipAddr = InetAddress.getByName(ip_address);
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, ipAddr, port);
+		senderSocket.send(packet);
 	}
 }
 
@@ -94,14 +92,28 @@ class ChatReceiver implements Runnable {
     public void run() {
         while (true) {
             try {
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            	DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 receiverSocket.receive(packet);
                 String received = new String(packet.getData(), 0, packet.getLength());
-                print(received);
+                String parsedMessage  = parseMessage(received);
+            	Date date = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+                String formattedDate = sdf.format(date);
+                
+                print(formattedDate + " " + parsedMessage);
             } catch(Exception e) {
-                System.err.println(e);
+            	System.err.println(e);
             }
         }
+    }
+    
+    public String parseMessage(String received) {
+    	System.out.print(received);
+    	String username = received.substring(received.indexOf("user:") + 5, received.indexOf("\n"));
+    	String message = received.substring(received.indexOf("message:") + 8, received.lastIndexOf("\n"));
+    	
+    	String parsedMessage = "[" + username + "]: " + message;
+    	return parsedMessage;
     }
     
     public void print(String receivedStr) {
