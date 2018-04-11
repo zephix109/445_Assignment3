@@ -39,13 +39,6 @@ class ChatSender implements Runnable {
         senderSocket = s;
     }
 
-	private void sendMessage(String s) throws Exception {
-		byte buf[] = s.getBytes();
-		InetAddress ipAddr = InetAddress.getByName(ip_address);
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, ipAddr, port);
-		senderSocket.send(packet);
-	}
-
 	@Override
 	public void run() {
 		
@@ -59,19 +52,30 @@ class ChatSender implements Runnable {
 		}
 		
         while (true) {
-            try {
-            	String line = in.readLine();
-            	if(line.equals("quit")) {
-            		System.out.println("Closing chatbox");
-            		System.exit(0);
-            	}
-                Date date = new Date();
-                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-                String formattedDate = sdf.format(date);                
-                sendMessage(formattedDate + " [" + username + "]: " + line);
-            } catch(Exception e) {
-                System.err.println(e);
-            }
+        	read_text_from_user_input(in);
+        }
+	}
+	
+	private void buildMessage(String s) throws Exception {
+		byte buf[] = s.getBytes();
+		InetAddress ipAddr = InetAddress.getByName(ip_address);
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, ipAddr, port);
+		senderSocket.send(packet);
+	}
+	
+	public void read_text_from_user_input(BufferedReader in) {
+		try {
+        	String line = in.readLine();
+        	if(line.equals("quit")) {
+        		System.out.println("Closing chatbox");
+        		System.exit(0);
+        	}
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+            String formattedDate = sdf.format(date);                
+            buildMessage(formattedDate + " [" + username + "]: " + line);
+        } catch(Exception e) {
+            System.err.println(e);
         }
 	}
 }
@@ -93,11 +97,15 @@ class ChatReceiver implements Runnable {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 receiverSocket.receive(packet);
                 String received = new String(packet.getData(), 0, packet.getLength());
-                System.out.println(received);
+                print(received);
             } catch(Exception e) {
                 System.err.println(e);
             }
         }
+    }
+    
+    public void print(String receivedStr) {
+    	System.out.println(receivedStr);
     }
 
 }
