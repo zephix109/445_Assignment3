@@ -30,7 +30,7 @@ public class Chat_Client {
 
 class ChatSender implements Runnable {
 
-	final static String ip_address = "127.0.0.1";
+	final static String ip_address = "255.255.255.255";
 	final static int port = 5555;
 	private DatagramSocket senderSocket;
 	String username;
@@ -96,7 +96,8 @@ class ChatReceiver implements Runnable {
                 receiverSocket.receive(packet);
                 String received = new String(packet.getData(), 0, packet.getLength());
                 String parsedMessage  = parseMessage(received);
-            	Date date = new Date();
+            	
+                Date date = new Date();
                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
                 String formattedDate = sdf.format(date);
                 
@@ -108,10 +109,8 @@ class ChatReceiver implements Runnable {
     }
     
     public String parseMessage(String received) {
-    	System.out.print(received);
     	String username = received.substring(received.indexOf("user:") + 5, received.indexOf("\n"));
-    	String message = received.substring(received.indexOf("message:") + 8, received.lastIndexOf("\n"));
-    	
+    	String message = received.substring(received.indexOf("message:") + 8, received.lastIndexOf("\n\n"));
     	String parsedMessage = "[" + username + "]: " + message;
     	return parsedMessage;
     }
