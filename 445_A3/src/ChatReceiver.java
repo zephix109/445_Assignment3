@@ -2,13 +2,16 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 class ChatReceiver implements Runnable {
 
 	DatagramSocket receiverSocket;
 	InetAddress group;
     byte buffer[];
+    List<String> usersList = new ArrayList<String>();
     
     ChatReceiver(DatagramSocket s, InetAddress g) {
         receiverSocket = s;
@@ -44,9 +47,23 @@ class ChatReceiver implements Runnable {
     	if(command.equals("TALK")) {
     		parsedMessage = formattedDate + " [" + username + "]: " + message;
     	} else if(command.equals("JOIN")) {
+    		usersList.add(username);
     		parsedMessage = formattedDate + " " + username + " joined!";
-    	} else if(command.equals("QUIT")) {
+    	} else if(command.equals("LEAVE")) {
+    		usersList.remove(username);
     		parsedMessage = formattedDate + " " + username + " left!";
+    	} else if(command.equals("WHO")) {
+    		parsedMessage = formattedDate + " Connected users: [";
+    		boolean addComma = false;
+    		for(String user : usersList) {
+    			if(!addComma) {
+    				parsedMessage += "'" + user + "'";
+    				addComma = true;
+    			} else {
+    				parsedMessage += ", '" + user + "'";
+    			}
+    		}
+    		parsedMessage += "]";
     	}
     	return parsedMessage;
     }

@@ -4,6 +4,8 @@ import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatSender implements Runnable {
 
@@ -44,10 +46,11 @@ public class ChatSender implements Runnable {
         	String line = in.readLine();
         	String command = "TALK";
         	if(line.equals("/leave")) {
-        		command = "QUIT";
-        		buildMessage(line, command);
-        		//System.out.println("Closing chatbox");
+        		command = "LEAVE";
+        		buildMessage("", command);
         		System.exit(0);
+        	} else if(line.equals("/who")) {		//TODO needs to be made local only
+        		command = "WHO";
         	}
             buildMessage(line, command);
         } catch(Exception e) {
