@@ -43,8 +43,10 @@ public class ChatSender implements Runnable {
 		try {
         	String line = in.readLine();
         	String command = "TALK";
-        	if(line.equals("quit")) {
-        		System.out.println("Closing chatbox");
+        	if(line.equals("/leave")) {
+        		command = "QUIT";
+        		buildMessage(line, command);
+        		//System.out.println("Closing chatbox");
         		System.exit(0);
         	}
             buildMessage(line, command);

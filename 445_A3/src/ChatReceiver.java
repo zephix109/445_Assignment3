@@ -45,6 +45,8 @@ class ChatReceiver implements Runnable {
     		parsedMessage = formattedDate + " [" + username + "]: " + message;
     	} else if(command.equals("JOIN")) {
     		parsedMessage = formattedDate + " " + username + " joined!";
+    	} else if(command.equals("QUIT")) {
+    		parsedMessage = formattedDate + " " + username + " left!";
     	}
     	return parsedMessage;
     }
