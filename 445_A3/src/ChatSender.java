@@ -26,8 +26,12 @@ public class ChatSender implements Runnable {
 		System.out.println("Welcome, please enter your name: ");
 		try {
 			username = in.readLine();
+			String command = "JOIN";
+			buildMessage("", command);
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		} catch (Exception e2) {
+			e2.printStackTrace();
 		}
 		
         while (true) {
@@ -38,20 +42,22 @@ public class ChatSender implements Runnable {
 	public void read_text_from_user_input(BufferedReader in) {
 		try {
         	String line = in.readLine();
+        	String command = "TALK";
         	if(line.equals("quit")) {
         		System.out.println("Closing chatbox");
         		System.exit(0);
         	}
-            buildMessage(line);
+            buildMessage(line, command);
         } catch(Exception e) {
             System.err.println(e);
         }
 	}
 	
-	private void buildMessage(String line) throws Exception {
-		String message = "user:" + username + "\nmessage:" + line + "\n\n";
+	private void buildMessage(String line, String command) throws Exception {
+		String message = "user:" + username + "\ncommand:" + command + "\nmessage:" + line + "\n\n";
 		byte buf[] = message.getBytes();
-		DatagramPacket packet = new DatagramPacket(buf, buf.length, group, port); 
-	    senderSocket.send(packet); 
+		InetAddress ipAddr = InetAddress.getByName(ip_address);
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, ipAddr, port);
+		senderSocket.send(packet);
 	}
 }
