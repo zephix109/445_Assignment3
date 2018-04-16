@@ -13,11 +13,13 @@ public class ChatSender implements Runnable {
 	final static int port = 5555;
 	private InetAddress group; 
 	private DatagramSocket senderSocket;
+	private DatagramSocket localSSocket;
 	String username;
 
-	ChatSender(DatagramSocket s, InetAddress g) { 
+	ChatSender(DatagramSocket l, DatagramSocket s, InetAddress g) { 
         senderSocket = s; 
-        group = g; 
+        group = g;
+        localSSocket = l;
     } 
 
 	@Override
@@ -62,11 +64,17 @@ public class ChatSender implements Runnable {
 	}
 	
 	private void localMessage(String line, String command) throws Exception {
+		if (command == null) return;
 		String message = "user:" + username + "\ncommand:" + command + "\nmessage:" + line + "\n\n";
 		byte buf[] = message.getBytes();
 		InetAddress ipAddr = InetAddress.getByName("localhost");
 		DatagramPacket packet = new DatagramPacket(buf, buf.length, ipAddr, port);
-		senderSocket.send(packet);
+		localSSocket.send(packet);
+//		String parsedMessage = "";
+//		if (command.equals("QUIT")) {
+//    		parsedMessage = "Goodbye, " + username;
+//		}
+//		System.out.println(parsedMessage);
 	}
 	
 	private void buildMessage(String line, String command) throws Exception {
