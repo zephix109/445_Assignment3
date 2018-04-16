@@ -49,8 +49,8 @@ public class ChatSender implements Runnable {
         	String command = "TALK";
         	if(line.equals("/leave")) {
         		command = "LEAVE";
-        		buildMessage("", command);
         		localMessage("", "QUIT");
+        		buildMessage("", command);
         		System.exit(0);
         	} else if(line.equals("/who")) {		//TODO needs to be made local only
         		command = "WHO";
