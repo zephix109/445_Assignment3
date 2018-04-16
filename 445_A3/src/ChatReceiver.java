@@ -64,6 +64,8 @@ class ChatReceiver implements Runnable {
     			}
     		}
     		parsedMessage += "]";
+    	} else if (command.equals("QUIT")) {
+    		parsedMessage = "Goodbye, " + username;
     	}
     	return parsedMessage;
     }

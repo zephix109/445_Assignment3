@@ -48,9 +48,12 @@ public class ChatSender implements Runnable {
         	if(line.equals("/leave")) {
         		command = "LEAVE";
         		buildMessage("", command);
+        		localMessage("", "QUIT");
         		System.exit(0);
         	} else if(line.equals("/who")) {		//TODO needs to be made local only
         		command = "WHO";
+        		localMessage(line, command);
+        		command = null;
         	}
             buildMessage(line, command);
         } catch(Exception e) {
@@ -58,7 +61,16 @@ public class ChatSender implements Runnable {
         }
 	}
 	
+	private void localMessage(String line, String command) throws Exception {
+		String message = "user:" + username + "\ncommand:" + command + "\nmessage:" + line + "\n\n";
+		byte buf[] = message.getBytes();
+		InetAddress ipAddr = InetAddress.getByName("localhost");
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, ipAddr, port);
+		senderSocket.send(packet);
+	}
+	
 	private void buildMessage(String line, String command) throws Exception {
+		if (command == null) return;
 		String message = "user:" + username + "\ncommand:" + command + "\nmessage:" + line + "\n\n";
 		byte buf[] = message.getBytes();
 		InetAddress ipAddr = InetAddress.getByName(ip_address);
